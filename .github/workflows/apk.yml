@@ -23,7 +23,19 @@ jobs:
           gradle-version: "8.7"
 
       - name: Abrir o projeto
-        run: unzip -o projeto-android.zip
+        run: |
+          if [ ! -f projeto-android/settings.gradle ]; then
+            arquivo=$(find . -iname 'projeto*android*.zip' | head -n 1)
+            if [ -z "$arquivo" ]; then
+              echo "Arquivos encontrados no repositório:"
+              find . -type f -not -path './.git/*'
+              echo "::error::Falta o projeto-android.zip. Envie o arquivo em Add file > Upload files."
+              exit 1
+            fi
+            echo "Abrindo $arquivo"
+            unzip -o "$arquivo"
+          fi
+          test -f projeto-android/settings.gradle
 
       - name: Compilar o APK
         working-directory: projeto-android
